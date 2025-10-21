@@ -1,5 +1,5 @@
 <script setup>
-    import axios from 'axios';
+import axios from 'axios';
 </script>
 
 <script>
@@ -16,8 +16,8 @@ export default {
     },
     computed: {
         baseUrl() {
-            if (window.location.hostname=='localhost')
-                return 'http://localhost:3000' 
+            if (window.location.hostname == 'localhost')
+                return 'http://localhost:3000'
             else {
                 const codespace_host = window.location.hostname.replace('5173', '3000')
                 return `https://${codespace_host}`;
@@ -36,10 +36,32 @@ export default {
     },
     methods: {
         editPost(id) {
-            
+            const post = this.posts.find(p => p.id === id);
+            if (post) {
+                this.entry = post.entry;
+                this.mood = post.mood;
+                this.editPostId = id;
+                this.showEditPost = true;
+            }
         },
-        updatePost(event) {
-            
+
+        async updatePost(event) {
+            event.preventDefault();
+
+            try {
+                await axios.post(`${this.baseUrl}/updatePost?id=${this.editPostId}`, {
+                    entry: this.entry,
+                    mood: this.mood,
+                });
+
+                // Re-fetch updated posts
+                const response = await axios.get(`${this.baseUrl}/posts`);
+                this.posts = response.data;
+
+                this.showEditPost = false;
+            } catch (error) {
+                console.error('Error updating post:', error);
+            }
         }
     }
 }
@@ -61,7 +83,7 @@ export default {
                     <td>{{ post.id }}</td>
                     <td>{{ post.entry }}</td>
                     <td>{{ post.mood }}</td>
-                    <td><button>Edit</button></td>
+                    <td><button @click="editPost(post.id)">Edit</button></td>
                 </tr>
             </tbody>
 
@@ -70,7 +92,7 @@ export default {
         <div id="editPost" v-if="showEditPost">
             <h3>Edit Post</h3>
             <div id="postContent" class="mx-3">
-                <form>
+                <form @submit.prevent="updatePost">
                     <div class="mb-3">
                         <label for="entry" class="form-label">Entry</label>
                         <textarea id="entry" class="form-control" v-model="entry" required></textarea>

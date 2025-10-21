@@ -2,8 +2,6 @@
 import axios from 'axios';
 
 export default {
-
-    // add code here
     data() {
         return {
             mood: ["Happy", "Sad", "Neutral","Angry"],
@@ -12,9 +10,19 @@ export default {
             selectedMood: ''
         }
     },
+    computed: {
+        baseUrl() {
+            if (window.location.hostname == 'localhost')
+                return 'http://localhost:3000'
+            else {
+                const codespace_host = window.location.hostname.replace('5173', '3000')
+                return `https://${codespace_host}`;
+            }
+        }
+    },
     methods: {
         addPost() {
-            axios.post("http://localhost:3000/addPost", {
+            axios.post(`${this.baseUrl}/addPost`, {
 
                     subject: this.subject,
                     entry: this.entry,
