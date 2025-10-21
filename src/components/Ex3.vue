@@ -1,9 +1,35 @@
 <script>
-    export default { 
+import axios from 'axios';
 
-       // add code here
+export default {
 
+    // add code here
+    data() {
+        return {
+            mood: ["Happy", "Sad", "Neutral","Angry"],
+            subject: "",
+            entry: "",
+            selectedMood: ''
+        }
+    },
+    methods: {
+        addPost() {
+            axios.post("http://localhost:3000/addPost", {
+
+                    subject: this.subject,
+                    entry: this.entry,
+                    mood: this.selectedMood
+                
+
+            }).then(response => {
+                console.log(response)
+            }).catch(error=>{
+                console.log(error)
+            })
+        }
     }
+
+}
 </script>
 
 <template>
@@ -19,14 +45,16 @@
 
         Mood:
         <!-- TODO: Build a dropdown list here for selecting the mood -->
+        <select v-model="selectedMood">
+            <option v-for="m in mood">{{ m }}</option>
+        </select>
 
         <br>
 
         <br>
-        <button>Submit New Post</button>
+        <button @click="addPost()">Submit New Post</button>
 
-        <hr> Click  <a><router-link to="/ViewPosts/">here</router-link></a>  to return to Main Page
-       
+        <hr> Click <a><router-link to="/ViewPosts/">here</router-link></a> to return to Main Page
+
     </div>
 </template>
-
